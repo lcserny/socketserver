@@ -1,24 +1,29 @@
 package net.cserny.comm;
 
-import javax.swing.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class MainClient {
 
-    public static void main(String[] args) throws IOException {
-        String serverAddress = JOptionPane.showInputDialog(
-                "Enter IP address of a machine that is\n" +
-                "running the date service on port 9090:"
-        );
-        Socket socket = new Socket(serverAddress, 9090);
-        BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        System.out.println("Welcome client");
 
-        String answer = input.readLine();
-        JOptionPane.showMessageDialog(null, answer);
+        Socket socket = new Socket("localhost", 4444);
+        System.out.println("Client connected");
 
-        System.exit(0);
+        ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
+        System.out.println("Ok");
+
+        Message message = new Message(new Integer(15), new Integer(32));
+        os.writeObject(message);
+        System.out.println("Retrieving message from server...");
+
+        ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
+        Message returnMessage = (Message) is.readObject();
+        System.out.println("Return Message is=" + returnMessage);
+
+        socket.close();
     }
 }
